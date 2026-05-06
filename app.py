@@ -144,9 +144,19 @@ if uploaded_file:
         else:
             output["CARATS"] = ""
 
-        # CERT#
+                # CERT#
         if cert_col:
-            output["CERT#"] = df[cert_col]
+
+            output["CERT#"] = (
+                df[cert_col]
+                .astype(str)
+                .str.replace(".0", "", regex=False)
+                .str.strip()
+            )
+
+            # ADD LG BEFORE NUMBER
+            output["CERT#"] = "LG" + output["CERT#"]
+
         else:
             output["CERT#"] = ""
 
