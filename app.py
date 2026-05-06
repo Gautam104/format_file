@@ -145,20 +145,27 @@ if uploaded_file:
             output["CARATS"] = ""
 
                 # CERT#
-        if cert_col:
+                # ================= CERT# AUTO FIND =================
 
-            output["CERT#"] = (
-                df[cert_col]
-                .astype(str)
-                .str.replace(".0", "", regex=False)
-                .str.strip()
-            )
+        cert_values = []
 
-            # ADD LG BEFORE NUMBER
-            output["CERT#"] = "LG" + output["CERT#"]
+        for index, row in df.iterrows():
 
-        else:
-            output["CERT#"] = ""
+            cert_found = ""
+
+            for value in row:
+
+                value = str(value).replace(".0", "").strip()
+
+                # CHECK 9 DIGIT NUMBER
+                if value.isdigit() and len(value) == 9:
+
+                    cert_found = "LG" + value
+                    break
+
+            cert_values.append(cert_found)
+
+        output["CERT#"] = cert_values
 
         # AMT/CTS $
         if rate_col:
