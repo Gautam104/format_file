@@ -12,6 +12,33 @@ uploaded_file = st.file_uploader(
     type=["xlsx", "xls"]
 )
 
+# ================= CUSTOM SR NO OPTION =================
+
+use_custom_sr = st.checkbox(
+    "Use Custom SR Number Start"
+)
+
+# DEFAULT VALUES
+cvd_start = 1
+hpht_start = 1
+
+# CUSTOM VALUES
+if use_custom_sr:
+
+    cvd_start = st.number_input(
+        "CVD Start Number",
+        min_value=1,
+        value=1,
+        step=1
+    )
+
+    hpht_start = st.number_input(
+        "HPHT Start Number",
+        min_value=1,
+        value=1,
+        step=1
+    )
+
 # ================= COMPANY OUTPUT FORMAT =================
 
 final_columns = [
@@ -183,7 +210,7 @@ if uploaded_file:
         output["ACTUAL SHAPE"] = ""
         output["VIDEO"] = ""
 
-        # ================= SPLIT FILES =================
+        # ================= CREATE SEPARATE FILES =================
 
         cvd_df = output[
             output["BRAND"] == "CVD"
@@ -193,15 +220,32 @@ if uploaded_file:
             output["BRAND"] == "HPHT"
         ].reset_index(drop=True)
 
-        # ================= SR NO =================
+        # ================= CVD SR NO =================
 
-        cvd_df["SR NO."] = [f"C{i+1}" for i in range(len(cvd_df))]
+        cvd_df["SR NO."] = [
+            f"C{i}"
+            for i in range(
+                cvd_start,
+                cvd_start + len(cvd_df)
+            )
+        ]
 
-        hpht_df["SR NO."] = [f"H{i+1}" for i in range(len(hpht_df))]
+        # ================= HPHT SR NO =================
+
+        hpht_df["SR NO."] = [
+            f"H{i}"
+            for i in range(
+                hpht_start,
+                hpht_start + len(hpht_df)
+            )
+        ]
 
         # ================= MERGE FINAL =================
 
-        output = pd.concat([cvd_df, hpht_df], ignore_index=True)
+        output = pd.concat(
+            [cvd_df, hpht_df],
+            ignore_index=True
+        )
 
         # ================= FINAL FORMAT =================
 
