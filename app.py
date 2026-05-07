@@ -102,7 +102,7 @@ if uploaded_file:
         cert_col = find_column(df, ["cert", "certificate"])
         rate_col = find_column(df, ["amt/cts", "price/ct", "rate"])
         total_col = find_column(df, ["total amt", "amount"])
-        vendor_col = find_column(df, ["vendor", "company"])
+        vendor_col = find_column(df, ["company"])
         video_col = find_column(df, ["video"])
 
         # ================= CREATE OUTPUT =================
