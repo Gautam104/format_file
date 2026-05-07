@@ -105,29 +105,44 @@ if uploaded_file:
         vendor_col = find_column(df, ["company"])
         video_col = find_column(df, ["video"])
 
-        # ================= KEEP ONLY VALID CERT ROWS =================
-
-        if cert_col:
-
-            df[cert_col] = (
-                df[cert_col]
-                .astype(str)
-                .str.replace(".0", "", regex=False)
-                .str.strip()
-            )
-
-            df = df[
-                df[cert_col].str.isdigit() &
-                (df[cert_col].str.len() == 9)
-            ]
-
         # ================= CREATE OUTPUT =================
 
         output = pd.DataFrame()
 
+        # ================= CERT# AUTO FIND =================
+
+        cert_values = []
+        valid_rows = []
+
+        for index, row in df.iterrows():
+
+            cert_found = ""
+
+            for value in row:
+
+                value = str(value).replace(".0", "").strip()
+
+                # CHECK 9 DIGIT NUMBER
+                if value.isdigit() and len(value) == 9:
+
+                    cert_found = "LG" + value
+                    break
+
+            # KEEP ONLY VALID CERT ROWS
+            if cert_found != "":
+
+                cert_values.append(cert_found)
+                valid_rows.append(index)
+
+        # FILTER ONLY VALID ROWS
+        df = df.loc[valid_rows].reset_index(drop=True)
+
+        # CERT#
+        output["CERT#"] = cert_values
+
         # VENDOR
         if vendor_col:
-            output["VENDOR"] = df[vendor_col]
+            output["VENDOR"] = df[vendor_col].reset_index(drop=True)
         else:
             output["VENDOR"] = "GOLDEN"
 
@@ -136,7 +151,7 @@ if uploaded_file:
 
         # SHAPE
         if shape_col:
-            output["SHAPE"] = df[shape_col]
+            output["SHAPE"] = df[shape_col].reset_index(drop=True)
         else:
             output["SHAPE"] = ""
 
@@ -144,37 +159,31 @@ if uploaded_file:
 
         # COLOR
         if color_col:
-            output["COLOR"] = df[color_col]
+            output["COLOR"] = df[color_col].reset_index(drop=True)
         else:
             output["COLOR"] = ""
 
         # CLARITY
         if clarity_col:
-            output["CLARITY"] = df[clarity_col]
+            output["CLARITY"] = df[clarity_col].reset_index(drop=True)
         else:
             output["CLARITY"] = ""
 
         # CARATS
         if cts_col:
-            output["CARATS"] = df[cts_col]
+            output["CARATS"] = df[cts_col].reset_index(drop=True)
         else:
             output["CARATS"] = ""
 
-        # CERT#
-        if cert_col:
-            output["CERT#"] = "LG" + df[cert_col].astype(str)
-        else:
-            output["CERT#"] = ""
-
         # AMT/CTS $
         if rate_col:
-            output["AMT/CTS $"] = df[rate_col]
+            output["AMT/CTS $"] = df[rate_col].reset_index(drop=True)
         else:
             output["AMT/CTS $"] = ""
 
         # TOTAL AMT $
         if total_col:
-            output["TOTAL AMT $"] = df[total_col]
+            output["TOTAL AMT $"] = df[total_col].reset_index(drop=True)
         else:
             output["TOTAL AMT $"] = ""
 
@@ -184,7 +193,7 @@ if uploaded_file:
         output["TOTAL AMT RS"] = 0
 
         # BRAND
-        output["BRAND"] = df.apply(detect_brand, axis=1)
+        output["BRAND"] = df.apply(detect_brand, axis=1).reset_index(drop=True)
 
         # ES CODE#
         output["ES CODE#"] = range(79720, 79720 + len(output))
@@ -194,7 +203,7 @@ if uploaded_file:
 
         # VIDEO
         if video_col:
-            output["VIDEO"] = df[video_col]
+            output["VIDEO"] = df[video_col].reset_index(drop=True)
         else:
             output["VIDEO"] = ""
 
