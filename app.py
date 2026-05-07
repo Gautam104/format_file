@@ -93,8 +93,6 @@ if uploaded_file:
 
         st.success("File Uploaded Successfully ✅")
 
-        
-        
         # ================= AUTO DETECT COLUMNS =================
 
         shape_col = find_column(df, ["shape"])
@@ -106,6 +104,22 @@ if uploaded_file:
         total_col = find_column(df, ["total amt", "amount"])
         vendor_col = find_column(df, ["company"])
         video_col = find_column(df, ["video"])
+
+        # ================= KEEP ONLY VALID CERT ROWS =================
+
+        if cert_col:
+
+            df[cert_col] = (
+                df[cert_col]
+                .astype(str)
+                .str.replace(".0", "", regex=False)
+                .str.strip()
+            )
+
+            df = df[
+                df[cert_col].str.isdigit() &
+                (df[cert_col].str.len() == 9)
+            ]
 
         # ================= CREATE OUTPUT =================
 
@@ -146,28 +160,8 @@ if uploaded_file:
         else:
             output["CARATS"] = ""
 
-                # CERT#
-                # ================= CERT# AUTO FIND =================
-
-        cert_values = []
-
-        for index, row in df.iterrows():
-
-            cert_found = ""
-
-            for value in row:
-
-                value = str(value).replace(".0", "").strip()
-
-                # CHECK 9 DIGIT NUMBER
-                if value.isdigit() and len(value) == 9:
-
-                    cert_found = "LG" + value
-                    break
-
-            cert_values.append(cert_found)
-
-        output["CERT#"] = cert_values
+        # CERT#
+        output["CERT#"] = "LG" + df[cert_col].astype(str)
 
         # AMT/CTS $
         if rate_col:
