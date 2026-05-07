@@ -88,11 +88,25 @@ def find_column(df, keywords):
 
 def detect_brand(row):
 
-    text = " ".join([str(x) for x in row.values]).upper()
+    text = " ".join(
+        [str(x) for x in row.values]
+    ).upper()
 
-    if "HPHT" in text:
+    # HPHT CHECK
+    if (
+        "HPHT" in text or
+        "HIGH PRESSURE HIGH TEMPERATURE" in text
+    ):
         return "HPHT"
 
+    # CVD CHECK
+    if (
+        "CVD" in text or
+        "CHEMICAL VAPOR DEPOSITION" in text
+    ):
+        return "CVD"
+
+    # DEFAULT
     return "CVD"
 
 # ================= MAIN =================
