@@ -284,4 +284,5 @@ if uploaded_file:
 
     except Exception as e:
 
+    if str(e) != "None":
         st.error(f"Error: {e}")
