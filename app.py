@@ -93,6 +93,8 @@ if uploaded_file:
 
         st.success("File Uploaded Successfully ✅")
 
+        
+        
         # ================= AUTO DETECT COLUMNS =================
 
         shape_col = find_column(df, ["shape"])
