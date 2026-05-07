@@ -161,7 +161,10 @@ if uploaded_file:
             output["CARATS"] = ""
 
         # CERT#
-        output["CERT#"] = "LG" + df[cert_col].astype(str)
+        if cert_col:
+            output["CERT#"] = "LG" + df[cert_col].astype(str)
+        else:
+            output["CERT#"] = ""
 
         # AMT/CTS $
         if rate_col:
@@ -284,5 +287,5 @@ if uploaded_file:
 
     except Exception as e:
 
-    if str(e) != "None":
-        st.error(f"Error: {e}")
+        if str(e) != "None":
+            st.error(f"Error: {e}")
