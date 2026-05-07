@@ -97,6 +97,11 @@ if uploaded_file:
 
         vendor_col = find_column(df, ["company"])
 
+        shape_col = find_column(df, ["shape"])
+        color_col = find_column(df, ["color"])
+        clarity_col = find_column(df, ["clarity"])
+        cts_col = find_column(df, ["cts", "carat", "weight", "size"])
+
         # ================= CREATE OUTPUT =================
 
         output = pd.DataFrame()
@@ -141,12 +146,34 @@ if uploaded_file:
         # BRAND
         output["BRAND"] = df.apply(detect_brand, axis=1).reset_index(drop=True)
 
+        # SHAPE
+        if shape_col:
+            output["SHAPE"] = df[shape_col].reset_index(drop=True)
+        else:
+            output["SHAPE"] = ""
+
+        output["SHAPE"] = output["SHAPE"].replace(shape_mapping)
+
+        # COLOR
+        if color_col:
+            output["COLOR"] = df[color_col].reset_index(drop=True)
+        else:
+            output["COLOR"] = ""
+
+        # CLARITY
+        if clarity_col:
+            output["CLARITY"] = df[clarity_col].reset_index(drop=True)
+        else:
+            output["CLARITY"] = ""
+
+        # CARATS
+        if cts_col:
+            output["CARATS"] = df[cts_col].reset_index(drop=True)
+        else:
+            output["CARATS"] = ""
+
         # ================= EMPTY COLUMNS =================
 
-        output["SHAPE"] = ""
-        output["COLOR"] = ""
-        output["CLARITY"] = ""
-        output["CARATS"] = ""
         output["AMT/CTS $"] = ""
         output["TOTAL AMT $"] = ""
         output["$ RATE"] = ""
