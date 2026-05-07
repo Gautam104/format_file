@@ -95,15 +95,7 @@ if uploaded_file:
 
         # ================= AUTO DETECT COLUMNS =================
 
-        shape_col = find_column(df, ["shape"])
-        color_col = find_column(df, ["color"])
-        clarity_col = find_column(df, ["clarity"])
-        cts_col = find_column(df, ["cts", "carat", "weight", "size"])
-        cert_col = find_column(df, ["cert", "certificate"])
-        rate_col = find_column(df, ["amt/cts", "price/ct", "rate"])
-        total_col = find_column(df, ["total amt", "amount"])
         vendor_col = find_column(df, ["company"])
-        video_col = find_column(df, ["video"])
 
         # ================= CREATE OUTPUT =================
 
@@ -146,80 +138,50 @@ if uploaded_file:
         else:
             output["VENDOR"] = "GOLDEN"
 
-        # SR NO
-        output["SR NO."] = [f"C{i+1}" for i in range(len(df))]
-
-        # SHAPE
-        if shape_col:
-            output["SHAPE"] = df[shape_col].reset_index(drop=True)
-        else:
-            output["SHAPE"] = ""
-
-        output["SHAPE"] = output["SHAPE"].replace(shape_mapping)
-
-        # COLOR
-        if color_col:
-            output["COLOR"] = df[color_col].reset_index(drop=True)
-        else:
-            output["COLOR"] = ""
-
-        # CLARITY
-        if clarity_col:
-            output["CLARITY"] = df[clarity_col].reset_index(drop=True)
-        else:
-            output["CLARITY"] = ""
-
-        # CARATS
-        if cts_col:
-            output["CARATS"] = df[cts_col].reset_index(drop=True)
-        else:
-            output["CARATS"] = ""
-
-        # AMT/CTS $
-        if rate_col:
-            output["AMT/CTS $"] = df[rate_col].reset_index(drop=True)
-        else:
-            output["AMT/CTS $"] = ""
-
-        # TOTAL AMT $
-        if total_col:
-            output["TOTAL AMT $"] = df[total_col].reset_index(drop=True)
-        else:
-            output["TOTAL AMT $"] = ""
-
-        # EMPTY COLUMNS
-        output["$ RATE"] = ""
-        output["AMT/CTS RS"] = 0
-        output["TOTAL AMT RS"] = 0
-
         # BRAND
         output["BRAND"] = df.apply(detect_brand, axis=1).reset_index(drop=True)
 
-        # ES CODE#
-        output["ES CODE#"] = range(79720, 79720 + len(output))
+        # ================= EMPTY COLUMNS =================
 
-        # ACTUAL SHAPE
-        output["ACTUAL SHAPE"] = output["SHAPE"]
-
-        # VIDEO
-        if video_col:
-            output["VIDEO"] = df[video_col].reset_index(drop=True)
-        else:
-            output["VIDEO"] = ""
-
-        # ================= FINAL FORMAT =================
-
-        output = output[final_columns]
+        output["SHAPE"] = ""
+        output["COLOR"] = ""
+        output["CLARITY"] = ""
+        output["CARATS"] = ""
+        output["AMT/CTS $"] = ""
+        output["TOTAL AMT $"] = ""
+        output["$ RATE"] = ""
+        output["AMT/CTS RS"] = ""
+        output["TOTAL AMT RS"] = ""
+        output["ES CODE#"] = ""
+        output["ACTUAL SHAPE"] = ""
+        output["VIDEO"] = ""
 
         # ================= SPLIT FILES =================
 
         cvd_df = output[
             output["BRAND"] == "CVD"
-        ]
+        ].reset_index(drop=True)
 
         hpht_df = output[
             output["BRAND"] == "HPHT"
-        ]
+        ].reset_index(drop=True)
+
+        # ================= SR NO =================
+
+        cvd_df["SR NO."] = [f"C{i+1}" for i in range(len(cvd_df))]
+
+        hpht_df["SR NO."] = [f"H{i+1}" for i in range(len(hpht_df))]
+
+        # ================= MERGE FINAL =================
+
+        output = pd.concat([cvd_df, hpht_df], ignore_index=True)
+
+        # ================= FINAL FORMAT =================
+
+        output = output[final_columns]
+
+        cvd_df = cvd_df[final_columns]
+        hpht_df = hpht_df[final_columns]
 
         # ================= SHOW DATA =================
 
