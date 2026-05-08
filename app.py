@@ -356,7 +356,7 @@ if uploaded_file:
 
         # CARATS
         if cts_col:
-            output["CARATS"] = df[cts_col].reset_index(drop=True)
+            output["CARATS"] = (df[cts_col].astype(float).map(lambda x: f"{x:.2f}").reset_index(drop=True))
         else:
             output["CARATS"] = ""
 
