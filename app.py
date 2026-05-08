@@ -271,6 +271,54 @@ if uploaded_file:
         # FILTER ONLY VALID ROWS
         df = df.loc[valid_rows].reset_index(drop=True)
 
+        # ================= AUTO DETECT COLUMNS =================
+
+        vendor_col = find_column(df, [
+            "company",
+            "vendor",
+            "seller",
+            "supplier",
+            "owner",
+            "party"
+        ])
+
+        shape_col = find_column(df, [
+            "shape",
+            "shp",
+            "cut",
+            "diamond shape",
+            "stone shape"
+        ])
+
+        color_col = find_column(df, [
+            "color",
+            "col",
+            "clr",
+            "diamond color",
+            "stone color"
+        ])
+
+        clarity_col = find_column(df, [
+            "clarity",
+            "cla",
+            "cl",
+            "diamond clarity",
+            "stone clarity"
+        ])
+
+        cts_col = find_column(df, [
+            "cts",
+            "cts.",
+            "ct",
+            "cts weight",
+            "carat",
+            "carats",
+            "weight",
+            "size",
+            "stone size",
+            "diamond weight"
+        ])
+
         # CERT#
         output["CERT#"] = cert_values
 
