@@ -107,7 +107,7 @@ def detect_brand(row):
         return "CVD"
 
     # DEFAULT
-    return "CVD"
+    return ""
 
 # ================= MAIN =================
 
@@ -371,6 +371,11 @@ if uploaded_file:
         output["ACTUAL SHAPE"] = ""
         output["VIDEO"] = ""
 
+
+        # REMOVE BLANK BRAND ROWS
+        output = output[
+            output["BRAND"] != ""
+        ].reset_index(drop=True)
         # ================= CREATE SEPARATE FILES =================
 
         cvd_df = output[
