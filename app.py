@@ -118,15 +118,72 @@ if uploaded_file:
         # ================= READ FILE =================
 
         if uploaded_file.name.endswith(".xls"):
-            df = pd.read_excel(uploaded_file, engine="xlrd")
+
+            temp_df = pd.read_excel(
+                uploaded_file,
+                engine="xlrd",
+                header=None
+            )
 
         else:
-            df = pd.read_excel(uploaded_file)
 
-        # ================= FIX SOME SELLER FILES =================
+            temp_df = pd.read_excel(
+                uploaded_file,
+                header=None
+            )
 
-        if all("Unnamed" in str(c) for c in df.columns):
-            df = pd.read_excel(uploaded_file, header=5)
+        # ================= AUTO FIND HEADER ROW =================
+
+        header_row = 0
+
+        possible_headers = [
+            "company",
+            "vendor",
+            "seller",
+            "shape",
+            "shp",
+            "color",
+            "col",
+            "clr",
+            "clarity",
+            "cl",
+            "carat",
+            "cts",
+            "stone no",
+            "cert"
+        ]
+
+        for i in range(min(20, len(temp_df))):
+
+            row_text = " ".join(
+                [str(x).lower() for x in temp_df.iloc[i].values]
+            )
+
+            if any(
+                header in row_text
+                for header in possible_headers
+            ):
+                header_row = i
+                break
+
+        # ================= RE-READ USING DETECTED HEADER =================
+
+        uploaded_file.seek(0)
+
+        if uploaded_file.name.endswith(".xls"):
+
+            df = pd.read_excel(
+                uploaded_file,
+                engine="xlrd",
+                header=header_row
+            )
+
+        else:
+
+            df = pd.read_excel(
+                uploaded_file,
+                header=header_row
+            )
 
         # ================= CLEAN COLUMNS =================
 
@@ -136,12 +193,51 @@ if uploaded_file:
 
         # ================= AUTO DETECT COLUMNS =================
 
-        vendor_col = find_column(df, ["company"])
+        vendor_col = find_column(df, [
+            "company",
+            "vendor",
+            "seller",
+            "supplier",
+            "owner",
+            "party"
+        ])
 
-        shape_col = find_column(df, ["shape"])
-        color_col = find_column(df, ["color"])
-        clarity_col = find_column(df, ["clarity"])
-        cts_col = find_column(df, ["cts", "carat", "weight", "size"])
+        shape_col = find_column(df, [
+            "shape",
+            "shp",
+            "cut",
+            "diamond shape",
+            "stone shape"
+        ])
+
+        color_col = find_column(df, [
+            "color",
+            "col",
+            "clr",
+            "diamond color",
+            "stone color"
+        ])
+
+        clarity_col = find_column(df, [
+            "clarity",
+            "cla",
+            "cl",
+            "diamond clarity",
+            "stone clarity"
+        ])
+
+        cts_col = find_column(df, [
+            "cts",
+            "cts.",
+            "ct",
+            "cts weight",
+            "carat",
+            "carats",
+            "weight",
+            "size",
+            "stone size",
+            "diamond weight"
+        ])
 
         # ================= CREATE OUTPUT =================
 
@@ -185,7 +281,10 @@ if uploaded_file:
             output["VENDOR"] = "GOLDEN"
 
         # BRAND
-        output["BRAND"] = df.apply(detect_brand, axis=1).reset_index(drop=True)
+        output["BRAND"] = df.apply(
+            detect_brand,
+            axis=1
+        ).reset_index(drop=True)
 
         # SHAPE
         if shape_col:
